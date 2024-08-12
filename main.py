@@ -182,8 +182,8 @@ async def set_channel(ctx, channel: discord.TextChannel):
     await ctx.send(f"Announcement channel set to: {channel.mention}")
 
 
-@bot.command(name='help', help='Lists all commands and supported links')
-async def help_command(ctx):
+@bot.command(name='commands', help='Lists all commands and supported links')
+async def commands(ctx):
     help_text = (
         "**Available Commands:**\n"
         "!join - Tells the bot to join the voice channel\n"
@@ -193,7 +193,7 @@ async def help_command(ctx):
         "!skip - Skips the active song\n"
         "!rem <index> - Removes a particular song from the playlist\n"
         "!channel <#channel> - Sets the channel for song announcements\n"
-        "!help - Lists all commands and supported links\n"
+        "!commands - Lists all commands and supported links\n"
         "!creds - Lists the credits to the creators\n\n"
         "**Supported Links:**\n"
         "- YouTube\n"
@@ -208,8 +208,8 @@ async def help_command(ctx):
 @bot.command(name='creds', help='Lists the credits to the creators')
 async def creds(ctx):
     creds_text = (
-        "This bot was created by Sfymmik.\n"
-        "Powered mainly by discord.py, yt-dlp"
+        "This bot was created by [Your Name or Team Name].\n"
+        "Powered by discord.py, yt-dlp, and other open-source projects."
     )
     await ctx.send(creds_text)
 
