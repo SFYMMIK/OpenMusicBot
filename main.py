@@ -208,8 +208,8 @@ async def help_command(ctx):
 @bot.command(name='creds', help='Lists the credits to the creators')
 async def creds(ctx):
     creds_text = (
-        "This bot was created by [Your Name or Team Name].\n"
-        "Powered by discord.py, yt-dlp, and other open-source projects."
+        "This bot was created by Sfymmik.\n"
+        "Powered mainly by discord.py, yt-dlp"
     )
     await ctx.send(creds_text)
 
