@@ -111,15 +111,17 @@ async def leave(ctx):
 
 @bot.command(name='play', help='To add a song to the playlist')
 async def play(ctx, url: str = None):
-    voice_channel = ctx.message.guild.voice_client
-    if not voice_channel:
-        await ctx.send("The bot is not connected to a voice channel.")
-        return
+    voice_channel = ctx.message.author.voice.channel if ctx.message.author.voice else None
+    if voice_channel:
+        if ctx.voice_client is None:
+            await voice_channel.connect()
+        elif ctx.voice_client.channel != voice_channel:
+            await ctx.voice_client.move_to(voice_channel)
 
     if url:
         queue.append(url)
         await ctx.send(f"**Added to queue:** {url}")
-        if not voice_channel.is_playing():
+        if not ctx.voice_client.is_playing():
             await play_next(ctx)
     elif ctx.message.attachments:
         try:
@@ -129,7 +131,7 @@ async def play(ctx, url: str = None):
                 await attachment.save(file_path)
                 queue.append(file_path)
                 await ctx.send(f"**Added to queue:** {attachment.filename}")
-                if not voice_channel.is_playing():
+                if not ctx.voice_client.is_playing():
                     await play_next(ctx)
             else:
                 await ctx.send("Please attach a valid .mp3 or .wav file.")
@@ -139,13 +141,16 @@ async def play(ctx, url: str = None):
         await ctx.send("Please provide a URL or attach an audio file.")
 
 
-@bot.command(name='stop', help='Stops the whole playlist')
+@bot.command(name='stop', help='Stops the whole playlist and disconnects the bot')
 async def stop(ctx):
     voice_client = ctx.message.guild.voice_client
     if voice_client.is_playing():
         queue.clear()
         voice_client.stop()
         await ctx.send("Stopped the playlist and cleared the queue.")
+    if voice_client.is_connected():
+        await voice_client.disconnect()
+        await ctx.send("Bot has left the voice channel.")
     else:
         await ctx.send("No audio is playing.")
 
@@ -183,8 +188,8 @@ async def help_command(ctx):
         "**Available Commands:**\n"
         "!join - Tells the bot to join the voice channel\n"
         "!leave - To make the bot leave the voice channel\n"
-        "!play <url or attach file> - To add songs to playlist\n"
-        "!stop - Stops the whole playlist\n"
+        "!play <url or attach file> - To add songs to playlist and join the voice channel\n"
+        "!stop - Stops the whole playlist and disconnects the bot\n"
         "!skip - Skips the active song\n"
         "!rem <index> - Removes a particular song from the playlist\n"
         "!channel <#channel> - Sets the channel for song announcements\n"
