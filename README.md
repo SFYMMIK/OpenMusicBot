@@ -60,7 +60,7 @@ The GUI will allow you to boot or stop the bot, and view or export logs.
 - **`!skip`**: Skips the current song in the playlist.
 - **`!rem <index>`**: Removes the song at the specified index from the playlist.
 - **`!channel <#channel>`**: Sets the channel where the bot will announce the currently playing song.
-- **`!help`**: Displays a list of available commands and supported links.
+- **`!commands`**: Displays a list of available commands and supported links.
 - **`!creds`**: Shows credits for the bot's creation.
 
 ### Supported Links
