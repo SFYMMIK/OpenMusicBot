@@ -27,8 +27,10 @@ def load_token():
         sys.exit(1)
 
 # Discord Bot Setup
-intents = discord.Intents.default()
-intents.message_content = True
+intents = discord.Intents.default()  # Use default intents
+intents.message_content = True  # Enable message content intent
+intents.members = True  # Enable Server Members Intent
+intents.presences = True  # Enable Presence Intent
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -288,6 +290,9 @@ class BotGUI(QWidget):
         self.boot_button.setText('Boot')
         self.boot_button.setStyleSheet("background-color: none")
         self.boot_button.setEnabled(True)
+
+    def update_log(self, message):
+        self.log(message)
 
     def log(self, message):
         self.log_data += message + "\n"
