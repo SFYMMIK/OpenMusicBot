@@ -1,17 +1,8 @@
 import sys
-import os
 import discord
 import yt_dlp as youtube_dl
 from discord.ext import commands
-from PyQt5.QtWidgets import (
-    QApplication,
-    QWidget,
-    QVBoxLayout,
-    QPushButton,
-    QTextEdit,
-    QFileDialog,
-)
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog
 
 # Function to load the bot token from a file
 def load_token():
@@ -29,8 +20,6 @@ def load_token():
 # Discord Bot Setup
 intents = discord.Intents.default()  # Use default intents
 intents.message_content = True  # Enable message content intent
-intents.members = True  # Enable Server Members Intent
-intents.presences = True  # Enable Presence Intent
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
@@ -57,7 +46,6 @@ ffmpeg_options = {
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
-
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
@@ -74,14 +62,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
 
-
 async def play_next(ctx):
     if queue:
         next_song = queue.pop(0)
         player = await YTDLSource.from_url(next_song, loop=bot.loop)
         ctx.voice_client.play(player, after=lambda e: bot.loop.create_task(play_next(ctx)))
         await ctx.send(f"**Now playing:** {player.title}")
-
         # Announce in the set channel
         if announcement_channel_id:
             channel = bot.get_channel(announcement_channel_id)
@@ -89,7 +75,6 @@ async def play_next(ctx):
                 await channel.send(f"**Now playing in {ctx.guild.name}:** {player.title}")
     else:
         await ctx.send("The playlist is empty.")
-
 
 @bot.command(name='join', help='Tells the bot to join the voice channel')
 async def join(ctx):
@@ -100,7 +85,6 @@ async def join(ctx):
         channel = ctx.message.author.voice.channel
     await channel.connect()
 
-
 @bot.command(name='leave', help='To make the bot leave the voice channel')
 async def leave(ctx):
     voice_client = ctx.message.guild.voice_client
@@ -109,7 +93,6 @@ async def leave(ctx):
         await ctx.send("Bot has left the voice channel.")
     else:
         await ctx.send("The bot is not connected to a voice channel.")
-
 
 @bot.command(name='play', help='To add a song to the playlist')
 async def play(ctx, url: str = None):
@@ -142,7 +125,6 @@ async def play(ctx, url: str = None):
     else:
         await ctx.send("Please provide a URL or attach an audio file.")
 
-
 @bot.command(name='stop', help='Stops the whole playlist and disconnects the bot')
 async def stop(ctx):
     voice_client = ctx.message.guild.voice_client
@@ -156,7 +138,6 @@ async def stop(ctx):
     else:
         await ctx.send("No audio is playing.")
 
-
 @bot.command(name='skip', help='Skips the current song')
 async def skip(ctx):
     voice_client = ctx.message.guild.voice_client
@@ -167,7 +148,6 @@ async def skip(ctx):
     else:
         await ctx.send("No audio is playing.")
 
-
 @bot.command(name='rem', help='Removes a particular song from the playlist')
 async def rem(ctx, index: int):
     if 0 < index <= len(queue):
@@ -176,13 +156,11 @@ async def rem(ctx, index: int):
     else:
         await ctx.send(f"Invalid index. There are {len(queue)} songs in the queue.")
 
-
 @bot.command(name='channel', help='Sets the channel for announcements')
 async def set_channel(ctx, channel: discord.TextChannel):
     global announcement_channel_id
     announcement_channel_id = channel.id
     await ctx.send(f"Announcement channel set to: {channel.mention}")
-
 
 @bot.command(name='commands', help='Lists all commands and supported links')
 async def commands(ctx):
@@ -206,7 +184,6 @@ async def commands(ctx):
     )
     await ctx.send(help_text)
 
-
 @bot.command(name='creds', help='Lists the credits to the creators')
 async def creds(ctx):
     creds_text = (
@@ -214,7 +191,6 @@ async def creds(ctx):
         "Powered by discord.py, yt-dlp, and other open-source projects."
     )
     await ctx.send(creds_text)
-
 
 class LogExporter(QWidget):
     def __init__(self):
@@ -243,7 +219,6 @@ class LogExporter(QWidget):
             with open(file_path, 'w') as file:
                 file.write(self.log_data)
             print(f"Log exported to {file_path}")
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
