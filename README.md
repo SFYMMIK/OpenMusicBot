@@ -1,3 +1,5 @@
+# This Discord Music Bot Is Unusable And Will Not Recieve Any Updates From Now On, Feel Free To Fix And Use It Or Even Copy It.
+
 
 # Discord Music Bot with GUI
 
