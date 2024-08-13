@@ -216,41 +216,17 @@ async def creds(ctx):
     await ctx.send(creds_text)
 
 
-class BotThread(QThread):
-    update_log = pyqtSignal(str)
-
-    def __init__(self):
-        super().__init__()
-
-    def run(self):
-        token = load_token()  # Load the token from the file
-        bot.run(token)
-
-    def stop_bot(self):
-        bot.loop.stop()
-        self.quit()
-
-
-class BotGUI(QWidget):
+class LogExporter(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.bot_thread = None
         self.log_data = ""
 
     def initUI(self):
-        self.setWindowTitle('Discord Bot GUI')
-        self.setGeometry(100, 100, 500, 400)
+        self.setWindowTitle('Discord Bot Log Exporter')
+        self.setGeometry(100, 100, 300, 100)
 
         layout = QVBoxLayout()
-
-        self.log_viewer = QTextEdit(self)
-        self.log_viewer.setReadOnly(True)
-        layout.addWidget(self.log_viewer)
-
-        self.boot_button = QPushButton('Boot', self)
-        self.boot_button.clicked.connect(self.toggle_bot)
-        layout.addWidget(self.boot_button)
 
         self.export_button = QPushButton('Export Log', self)
         self.export_button.clicked.connect(self.export_log)
@@ -258,56 +234,26 @@ class BotGUI(QWidget):
 
         self.setLayout(layout)
 
-    def toggle_bot(self):
-        if self.boot_button.text() == 'Boot':
-            self.boot_button.setText('Booting up...')
-            self.boot_button.setStyleSheet("background-color: yellow")
-            self.boot_button.setEnabled(False)
-            self.start_bot()
-        elif self.boot_button.text() == 'Stop':
-            self.stop_bot()
-
-    def start_bot(self):
-        self.bot_thread = BotThread()
-        self.bot_thread.update_log.connect(self.update_log)
-        self.bot_thread.finished.connect(self.on_bot_stopped)
-        self.bot_thread.start()
-        self.log("Starting bot...")
-        self.boot_button.setText('Stop')
-        self.boot_button.setStyleSheet("background-color: green")
-        self.boot_button.setEnabled(True)
-
-    def stop_bot(self):
-        if self.bot_thread:
-            self.bot_thread.stop_bot()
-            self.log("Stopping bot...")
-            self.boot_button.setText('Boot')
-            self.boot_button.setStyleSheet("background-color: none")
-            self.boot_button.setEnabled(True)
-
-    def on_bot_stopped(self):
-        self.log("Bot stopped.")
-        self.boot_button.setText('Boot')
-        self.boot_button.setStyleSheet("background-color: none")
-        self.boot_button.setEnabled(True)
-
-    def update_log(self, message):
-        self.log(message)
-
     def log(self, message):
         self.log_data += message + "\n"
-        self.log_viewer.append(message)
 
     def export_log(self):
         file_path, _ = QFileDialog.getSaveFileName(self, "Save Log", "", "Log Files (*.log);;All Files (*)")
         if file_path:
             with open(file_path, 'w') as file:
                 file.write(self.log_data)
-            self.log(f"Log exported to {file_path}")
+            print(f"Log exported to {file_path}")
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    gui = BotGUI()
-    gui.show()
+    log_exporter = LogExporter()
+
+    # Start the bot in a separate thread to keep the UI responsive
+    def start_bot():
+        token = load_token()  # Load the token from the file
+        bot.run(token)
+
+    log_exporter.show()
+    start_bot()
     sys.exit(app.exec_())
