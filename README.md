@@ -46,7 +46,7 @@ This is a Discord music bot built using `discord.py`, `yt-dlp`, and `PyQt5`. The
 To run the bot with the GUI, execute the following command:
 
 ```bash
-python bot.py
+python main.py
 ```
 
 The GUI will allow you to boot or stop the bot, and view or export logs.
